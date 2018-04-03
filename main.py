@@ -99,12 +99,12 @@ def add_values(values):
 
 
 required_fields = [
-    "first", "last", "email", "age", "zip", "insurance"
+    "first", "last", "email", "age", "zip"
 ]
 
 optional_fields = [
     "provider-gender", "phone", "lang", "max-spend", "other", "patient-gender",
-    "experience", "tell-us"
+    "experience", "tell-us", "insurance"
 ]
 
 field_order = [
