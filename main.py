@@ -19,8 +19,9 @@ CONTENT_A = """<!DOCTYPE html> <html lang=en xmlns=http://www.w3.org/1999/xhtml 
 
 CONTENT_B = """,</span></font></div><div style=color:rgb(0,0,0);font-family:arial,sans-serif;font-size:medium><font color=#555555 face=sans-serif><span style=font-size:15px>&nbsp;</span></font></div><div><div><span style=font-size:15px;background-color:rgb(255,255,255)><font color=#555555 face=sans-serif>Thanks for getting in touch! We'll get back to you within the next 48-72 hours with therapist recommendations that meet your needs.<br><br>Please don't hesitate to reach out if you have any questions about Monday or therapy in general. We're here for you.<br><br>Be well,<br>Monday</span></div></div></div></div> </td> </tr> </table> </td> </tr> </table> <table role=presentation cellspacing=0 cellpadding=0 border=0 align=center width=100% style=max-width:680px;font-family:sans-serif;color:#888;font-size:12px;line-height:140%> <tr> <td style="padding:40px 10px;width:100%;font-family:sans-serif;font-size:12px;line-height:140%;text-align:center;color:#888" class=x-gmail-data-detectors> © 2018 Monday Health Inc.<br>201 E 25th Street, New York, NY 10010<br><a href=mailto:hello@mondayhealth.com>hello@mondayhealth.com</a><br><br><a href=https://www.monday.health/terms/>Terms of Use</a> | <a href=https://www.monday.health/privacypolicy/>Privacy Policy</a> <br><br> </td> </tr> </table> <!--[if mso]> </td> </tr> </table> <![endif]--> </div> </div> </body> </html>"""
 
-FROM = "recommendations@mondayhealth.com"
+FROM = "Monday Health <recommendations@mondayhealth.com>"
 
+BCC_RECIPIENTS = ["chris@mondayhealth.com", "enrique@mondayhealth.com"]
 
 def send_mail(body):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -56,6 +57,7 @@ def create_message(to, name):
     message['to'] = to
     message['from'] = FROM
     message['subject'] = "Welcome to Monday!"
+    message['bcc'] = ", ".join(BCC_RECIPIENTS)
     message.attach(simple)
     message.attach(html)
     return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
@@ -159,8 +161,7 @@ def lambda_entry(params: dict, context):
 
 
 def command_line():
-    from pprint import pprint
-    pprint(add_values([1, 2, 3, 4, 5, 6, 8, 9, 0]))
+    send_mail(create_message("ixplode@gmail.com", "christopher"))
 
 
 if __name__ == '__main__':
