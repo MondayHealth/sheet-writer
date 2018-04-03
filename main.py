@@ -104,13 +104,13 @@ required_fields = [
 
 optional_fields = [
     "provider-gender", "phone", "lang", "max-spend", "other", "patient-gender",
-    "experience"
+    "experience", "tell-us"
 ]
 
 field_order = [
     "date", "time", "problem", "first", "last", "email", "phone", "age", "zip",
     "insurance", "provider-gender", "lang", "max-spend", "other",
-    "patient-gender", "experience"
+    "patient-gender", "experience", "tell-us"
 ]
 
 
