@@ -5,6 +5,7 @@ import datetime
 import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import MutableMapping
 
 from apiclient import discovery
 # noinspection PyPackageRequirements
@@ -28,6 +29,7 @@ def send_mail(body):
         ])
 
     # YOU NEED TO PUT THE CLIENT ID IN THE FIELD. NOT THE ADDRESS
+    # https://admin.google.com/AdminHome?fral=1&chromeless=0#OGX:ManageOauthClients
     address = "enrique@mondayhealth.com"
     credentials = credentials.create_delegated(address)
     gmail = discovery.build('gmail', 'v1', credentials=credentials)
@@ -97,11 +99,18 @@ def add_values(values):
 
 
 required_fields = [
-    "first", "last", "email", "phone", "age", "zip", "insurance"
+    "first", "last", "email", "age", "zip", "insurance"
 ]
 
 optional_fields = [
-    "provider-gender", "lang", "max-spend", "other", "patient-gender",
+    "provider-gender", "phone", "lang", "max-spend", "other", "patient-gender",
+    "experience"
+]
+
+field_order = [
+    "date", "time", "problem", "first", "last", "email", "phone", "age", "zip",
+    "insurance", "provider-gender", "lang", "max-spend", "other",
+    "patient-gender", "experience"
 ]
 
 
@@ -119,11 +128,12 @@ def lambda_entry(params: dict, context):
         return _error("problem is not an iterable")
 
     now: datetime.datetime = datetime.datetime.now()
-    values: list = [
-        "{0:%m/%d/%Y}".format(now),
-        "{0:%H:%M:%S}".format(now),
-        ", ".join(params['problem'])
-    ]
+
+    found: MutableMapping[str, str] = {
+        "date": "{0:%m/%d/%Y}".format(now),
+        "time": "{0:%H:%M:%S}".format(now),
+        "problem": ", ".join(params['problem'])
+    }
 
     for required in required_fields:
         val = params.get(required, "")
@@ -131,19 +141,16 @@ def lambda_entry(params: dict, context):
             return _error("missing required field: " + required + " " + val)
         if len(val) > 256:
             return _error("param " + required + " too long")
-        values.append(val)
+        found[required] = val
 
     for optional in optional_fields:
         val = params.get(optional, "")
-        if not val:
-            values.append("")
-            continue
         if len(val) > 512:
             return _error("param " + optional + " too long")
-        values.append(val)
+        found[optional] = val
 
     # Do it
-    add_values(values)
+    add_values(list(map(lambda x: found[x], field_order)))
 
     # Send an email
     send_mail(create_message(params.get("email"), params.get("first")))
@@ -157,5 +164,4 @@ def command_line():
 
 
 if __name__ == '__main__':
-
     command_line()
