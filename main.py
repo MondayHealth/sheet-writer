@@ -3,7 +3,6 @@ from __future__ import print_function
 import base64
 import datetime
 import os
-from pytz import timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import MutableMapping
@@ -12,6 +11,7 @@ from apiclient import discovery
 # noinspection PyPackageRequirements
 from google.oauth2 import service_account
 from oauth2client.service_account import ServiceAccountCredentials
+from pytz import timezone
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = os.path.abspath('./s_private_key.json')
@@ -23,6 +23,24 @@ CONTENT_B = """,</span></font></div><div style=color:rgb(0,0,0);font-family:aria
 FROM = "Monday Health <recommendations@mondayhealth.com>"
 
 BCC_RECIPIENTS = ["chris@mondayhealth.com", "enrique@mondayhealth.com"]
+
+TIMEZONE = "US/Eastern"
+
+required_fields = [
+    "first", "last", "email", "age", "zip"
+]
+
+optional_fields = [
+    "provider-gender", "phone", "lang", "max-spend", "other", "patient-gender",
+    "experience", "tell-us", "insurance"
+]
+
+field_order = [
+    "date", "time", "problem", "first", "last", "email", "phone", "age", "zip",
+    "insurance", "provider-gender", "lang", "max-spend", "other",
+    "patient-gender", "experience", "tell-us"
+]
+
 
 def send_mail(body):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -46,7 +64,7 @@ def send_mail(body):
 
 
 def create_message(to, name):
-    simple = MIMEText("Hey " + name + """", 
+    simple = MIMEText("Hey " + name + """, 
     Thanks for getting in touch! We'll get back to you within the next 48-72 hours with therapist recommendations that meet your needs.
     
     Please don't hesitate to reach out if you have any questions about Monday or therapy in general. We're here for you.
@@ -101,22 +119,6 @@ def add_values(values):
     return request.execute()
 
 
-required_fields = [
-    "first", "last", "email", "age", "zip"
-]
-
-optional_fields = [
-    "provider-gender", "phone", "lang", "max-spend", "other", "patient-gender",
-    "experience", "tell-us", "insurance"
-]
-
-field_order = [
-    "date", "time", "problem", "first", "last", "email", "phone", "age", "zip",
-    "insurance", "provider-gender", "lang", "max-spend", "other",
-    "patient-gender", "experience", "tell-us"
-]
-
-
 def _error(reason: str):
     return {"success": False, "reason": reason}
 
@@ -130,7 +132,7 @@ def lambda_entry(params: dict, context):
     except TypeError:
         return _error("problem is not an iterable")
 
-    eastern = timezone('US/Eastern')
+    eastern = timezone(TIMEZONE)
     now: datetime.datetime = datetime.datetime.now()
     offset_time = eastern.localize(now)
 
