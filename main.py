@@ -132,13 +132,11 @@ def lambda_entry(params: dict, context):
     except TypeError:
         return _error("problem is not an iterable")
 
-    eastern = timezone(TIMEZONE)
-    now: datetime.datetime = datetime.datetime.now()
-    offset_time = eastern.localize(now)
-
+    tz = timezone(TIMEZONE)
+    now: datetime.datetime = datetime.datetime.now(tz)
     found: MutableMapping[str, str] = {
-        "date": offset_time.strftime("%m/%d/%Y"),
-        "time": offset_time.strftime("%H:%M:%S"),
+        "date": "{0:%m/%d/%Y}".format(now),
+        "time": "{0:%H:%M:%S}".format(now),
         "problem": ", ".join(params['problem'])
     }
 
@@ -167,11 +165,14 @@ def lambda_entry(params: dict, context):
 
 def command_line():
     # send_mail(create_message("ixplode@gmail.com", "christopher"))
-    eastern = timezone('US/Eastern')
-    now: datetime.datetime = datetime.datetime.now()
-    offset_time = eastern.localize(now)
-    print(offset_time.strftime("%m/%d/%Y"))
-    print(offset_time.strftime("%H:%M:%S"))
+    tz = timezone(TIMEZONE)
+    now: datetime.datetime = datetime.datetime.now(tz)
+    found: MutableMapping[str, str] = {
+        "date": "{0:%m/%d/%Y}".format(now),
+        "time": "{0:%H:%M:%S}".format(now)
+    }
+    print(now)
+    print(found)
 
 
 if __name__ == '__main__':
