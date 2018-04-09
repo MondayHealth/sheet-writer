@@ -98,7 +98,9 @@ def service():
 
 
 def add_values(values):
-    spreadsheet_id = '1zGH6qgBABvchyu3C1rCexqHSL3rIzSmJbyM30DRxnDk'
+    spreadsheet_id = '15XyZ_fPkJuJbi0He7sCfN2ChLaLZ-WWHZtbqrwcF5TA'
+    # old mondayhealth.com sheet
+    # spreadsheet_id = '1zGH6qgBABvchyu3C1rCexqHSL3rIzSmJbyM30DRxnDk'
 
     # The A1 notation of a range to search for a logical table of data.
     # Values will be appended after the last row of the table.
